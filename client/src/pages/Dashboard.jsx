@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
+import DashboardLayout from '../components/layout/DashboardLayout';
+import StatCard from '../components/ui/StatCard';
 import GithubWidget from '../components/widgets/GithubWidget';
 import SteamWidget from '../components/widgets/SteamWidget';
 
@@ -7,23 +8,27 @@ function Dashboard() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <Navbar />
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-white mb-1">
-          Bienvenue, {user?.email}
+    <DashboardLayout>
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-[#FAFAFA] tracking-tight">
+          Dashboard
         </h1>
-        <p className="text-slate-400 text-sm mb-8">
-          Voici un aperçu de ton activité récente
+        <p className="text-sm text-[#A1A1AA] mt-1">
+          Bienvenue, {user?.email}
         </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <GithubWidget />
-          <SteamWidget />
-        </div>
       </div>
-    </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+        <StatCard label="Connected services" value="2" sublabel="GitHub, Steam" />
+        <StatCard label="Data points" value="10" sublabel="Repos + jeux" />
+        <StatCard label="System status" value="OK" sublabel="Opérationnel" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <GithubWidget />
+        <SteamWidget />
+      </div>
+    </DashboardLayout>
   );
 }
 

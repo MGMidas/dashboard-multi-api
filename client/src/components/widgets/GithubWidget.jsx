@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import * as api from '../../services/api';
+import Card from '../ui/Card';
+import Badge from '../ui/Badge';
+import Button from '../ui/Button';
+import EmptyState from '../ui/EmptyState';
+import ErrorState from '../ui/ErrorState';
+import Skeleton from '../ui/Skeleton';
 
 function GithubWidget() {
   const [repos, setRepos] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | error | success
+  const [status, setStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [stale, setStale] = useState(false);
 
@@ -20,45 +27,66 @@ function GithubWidget() {
       setStatus('success');
     } catch (err) {
       setErrorMessage(err.message);
-      setStatus('error');
+      setStatus(err.message.includes('lié') ? 'empty' : 'error');
     }
   }
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 w-full">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-white font-semibold">💻 GitHub</h2>
-        {stale && (
-          <span className="text-yellow-400 text-xs">⚠ Données périmées</span>
-        )}
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg">💻</span>
+          <span className="text-sm font-medium text-[#FAFAFA]">GitHub</span>
+          {status === 'success' && <Badge variant="success">Connected</Badge>}
+        </div>
+        {stale && <Badge variant="warning">Données périmées</Badge>}
       </div>
 
       {status === 'loading' && (
-        <p className="text-slate-400 text-sm">Chargement...</p>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-14 w-full" />
+          ))}
+        </div>
+      )}
+
+      {status === 'empty' && (
+        <EmptyState
+          title="GitHub isn't connected"
+          description="Connect your GitHub account to start seeing your repositories."
+          actionLabel="Connect GitHub"
+        />
       )}
 
       {status === 'error' && (
-        <p className="text-red-400 text-sm">{errorMessage}</p>
+        <ErrorState description={errorMessage} onRetry={loadData} />
       )}
 
       {status === 'success' && (
-        <ul className="space-y-2">
-          {repos.map((repo) => (
-            <li
-              key={repo.id || repo.name}
-              className="bg-slate-900/40 hover:bg-slate-900/60 rounded-lg p-3 transition ..."
-            >
-              <p className="text-white font-medium">
-                {repo.repo_name || repo.name}
-              </p>
-              <p className="text-slate-400 text-xs mt-1">
-                {repo.language || 'N/A'}
-              </p>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-1.5">
+            {repos.map((repo) => (
+              <li
+                key={repo.id || repo.name}
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors duration-150"
+              >
+                <span className="text-sm text-[#FAFAFA] truncate">
+                  {repo.repo_name || repo.name}
+                </span>
+                <span className="text-xs text-[#A1A1AA] shrink-0 ml-2">
+                  {repo.language || 'N/A'}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <Link to="/connections">
+            <Button variant="ghost" className="mt-3 w-full justify-center">
+              View GitHub
+            </Button>
+          </Link>
+        </>
       )}
-    </div>
+    </Card>
   );
 }
 

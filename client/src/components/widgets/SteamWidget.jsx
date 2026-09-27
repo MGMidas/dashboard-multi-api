@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import * as api from '../../services/api';
+import Card from '../ui/Card';
+import Badge from '../ui/Badge';
+import Button from '../ui/Button';
+import EmptyState from '../ui/EmptyState';
+import ErrorState from '../ui/ErrorState';
+import Skeleton from '../ui/Skeleton';
 
 function SteamWidget() {
   const [games, setGames] = useState([]);
@@ -20,61 +27,97 @@ function SteamWidget() {
       setStatus('success');
     } catch (err) {
       setErrorMessage(err.message);
-      setStatus('error');
+      setStatus(err.message.includes('lié') ? 'empty' : 'error');
     }
   }
 
   function formatPlaytime(minutes) {
-    const hours = Math.round(minutes / 60);
-    return `${hours} h`;
+    return `${Math.round(minutes / 60)} h`;
   }
 
+  const totalPlaytime = games.reduce(
+    (sum, g) => sum + (g.playtime_minutes || g.playtimeMinutes || 0),
+    0
+  );
+
   return (
-    <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 w-full">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-white font-semibold">🎮 Steam</h2>
-        {stale && (
-          <span className="text-yellow-400 text-xs">⚠ Données périmées</span>
-        )}
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg">🎮</span>
+          <span className="text-sm font-medium text-[#FAFAFA]">Steam</span>
+          {status === 'success' && <Badge variant="success">Connected</Badge>}
+        </div>
+        {stale && <Badge variant="warning">Données périmées</Badge>}
       </div>
 
       {status === 'loading' && (
-        <p className="text-slate-400 text-sm">Chargement...</p>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </div>
+      )}
+
+      {status === 'empty' && (
+        <EmptyState
+          title="Steam isn't connected"
+          description="Connect your Steam account to start seeing your game library."
+          actionLabel="Connect Steam"
+        />
       )}
 
       {status === 'error' && (
-        <p className="text-red-400 text-sm">{errorMessage}</p>
+        <ErrorState description={errorMessage} onRetry={loadData} />
       )}
 
       {status === 'success' && (
-        <ul className="space-y-2">
-          {games.map((game) => (
-            <li
-              key={game.id || game.appid}
-              className="bg-slate-700 rounded p-3 flex gap-3 items-center"
-            >
-              {(game.rawg_image_url || game.rawgImageUrl) && (
-                <img
-                  src={game.rawg_image_url || game.rawgImageUrl}
-                  alt={game.game_name || game.name}
-                  className="w-14 h-14 object-cover rounded flex-shrink-0"
-                />
-              )}
-              <div className="min-w-0">
-                <p className="text-white font-medium truncate">
-                  {game.game_name || game.name}
-                </p>
-                <p className="text-slate-400 text-xs mt-1">
-                  {formatPlaytime(game.playtime_minutes || game.playtimeMinutes)}
-                  {(game.rawg_genre || game.rawgGenre) && ` · ${game.rawg_genre || game.rawgGenre}`}
-                  {(game.rawg_rating || game.rawgRating) && ` · ⭐ ${game.rawg_rating || game.rawgRating}`}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <>
+          {games.length > 0 && (
+            <p className="text-xs text-[#A1A1AA] mb-3">
+              {formatPlaytime(totalPlaytime)} de jeu au total
+            </p>
+          )}
+          <ul className="space-y-1.5">
+            {games.map((game) => {
+              const image = game.rawg_image_url || game.rawgImageUrl;
+              const name = game.game_name || game.name;
+              const playtime = game.playtime_minutes || game.playtimeMinutes;
+              const genre = game.rawg_genre || game.rawgGenre;
+              const rating = game.rawg_rating || game.rawgRating;
+
+              return (
+                <li
+                  key={game.id || game.appid}
+                  className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/[0.03] transition-colors duration-150"
+                >
+                  {image && (
+                    <img
+                      src={image}
+                      alt={name}
+                      className="w-11 h-11 object-cover rounded-md shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-[#FAFAFA] truncate">{name}</p>
+                    <p className="text-xs text-[#A1A1AA] mt-0.5">
+                      {formatPlaytime(playtime)}
+                      {genre && ` · ${genre}`}
+                      {rating && ` · ★ ${rating}`}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <Link to="/connections">
+            <Button variant="ghost" className="mt-3 w-full justify-center">
+              View Steam
+            </Button>
+          </Link>
+        </>
       )}
-    </div>
+    </Card>
   );
 }
 

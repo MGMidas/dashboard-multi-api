@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import * as api from '../services/api';
+import DashboardLayout from '../components/layout/DashboardLayout';
+import Card from '../components/ui/Card';
+import Badge from '../components/ui/Badge';
+import Button from '../components/ui/Button';
 
 const SERVICES = [
-  { key: 'github', label: 'GitHub', fieldLabel: 'Username GitHub' },
-  { key: 'steam', label: 'Steam', fieldLabel: 'Steam ID' },
+  { key: 'github', label: 'GitHub', icon: '💻', description: 'Affiche tes repositories récents et leur activité.', fieldLabel: 'Username GitHub' },
+  { key: 'steam', label: 'Steam', icon: '🎮', description: 'Affiche ta bibliothèque de jeux et ton temps de jeu.', fieldLabel: 'Steam ID' },
 ];
 
 function Connections() {
@@ -60,69 +63,94 @@ function Connections() {
     }
   }
 
+  const connectedServices = SERVICES.filter((s) => isConnected(s.key));
+  const availableServices = SERVICES.filter((s) => !isConnected(s.key));
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <p className="text-white">Chargement...</p>
-      </div>
+      <DashboardLayout>
+        <p className="text-sm text-[#A1A1AA]">Chargement...</p>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 px-4 py-8">
-      <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Connexions</h1>
-          <Link to="/dashboard" className="text-purple-400 hover:underline text-sm">
-            ← Dashboard
-          </Link>
+    <DashboardLayout>
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-[#FAFAFA] tracking-tight">
+          Connections
+        </h1>
+        <p className="text-sm text-[#A1A1AA] mt-1">
+          Gère les services connectés à ton dashboard
+        </p>
+      </div>
+
+      {error && (
+        <div className="mb-6 px-4 py-3 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 text-sm text-[#EF4444]">
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-400 text-sm p-3 rounded mb-4">
-            {error}
+      {connectedServices.length > 0 && (
+        <div className="mb-8">
+          <p className="text-xs font-medium tracking-wider text-[#A1A1AA]/70 mb-3">
+            CONNECTED
+          </p>
+          <div className="space-y-3">
+            {connectedServices.map((service) => (
+              <Card key={service.key} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">{service.icon}</span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#FAFAFA]">{service.label}</span>
+                      <Badge variant="success">Connected</Badge>
+                    </div>
+                    <p className="text-xs text-[#A1A1AA] mt-0.5">{getExternalId(service.key)}</p>
+                  </div>
+                </div>
+                <Button variant="danger" onClick={() => handleDisconnect(service.key)}>
+                  Disconnect
+                </Button>
+              </Card>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="space-y-4">
-          {SERVICES.map(({ key, label, fieldLabel }) => (
-            <div key={key} className="bg-slate-800 p-4 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white font-semibold">{label}</span>
-                {isConnected(key) && (
-                  <span className="text-green-400 text-sm">✓ Connecté ({getExternalId(key)})</span>
-                )}
-              </div>
-
-              {isConnected(key) ? (
-                <button
-                  onClick={() => handleDisconnect(key)}
-                  className="w-full p-2 rounded bg-slate-700 hover:bg-red-900 text-white text-sm transition"
-                >
-                  Délier
-                </button>
-              ) : (
+      {availableServices.length > 0 && (
+        <div>
+          <p className="text-xs font-medium tracking-wider text-[#A1A1AA]/70 mb-3">
+            AVAILABLE
+          </p>
+          <div className="space-y-3">
+            {availableServices.map((service) => (
+              <Card key={service.key}>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-lg">{service.icon}</span>
+                  <div>
+                    <span className="text-sm font-medium text-[#FAFAFA]">{service.label}</span>
+                    <p className="text-xs text-[#A1A1AA] mt-0.5">{service.description}</p>
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder={fieldLabel}
-                    value={inputs[key] || ''}
-                    onChange={(e) => setInputs({ ...inputs, [key]: e.target.value })}
-                    className="flex-1 p-2 rounded bg-slate-700 text-white placeholder-slate-400 outline-none text-sm"
+                    placeholder={service.fieldLabel}
+                    value={inputs[service.key] || ''}
+                    onChange={(e) => setInputs({ ...inputs, [service.key]: e.target.value })}
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-[#FAFAFA] placeholder-[#A1A1AA] outline-none focus:border-[#8B5CF6]/50 transition-colors duration-150"
                   />
-                  <button
-                    onClick={() => handleConnect(key)}
-                    className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold transition"
-                  >
-                    Lier
-                  </button>
+                  <Button onClick={() => handleConnect(service.key)}>
+                    Connect
+                  </Button>
                 </div>
-              )}
-            </div>
-          ))}
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </DashboardLayout>
   );
 }
 

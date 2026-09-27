@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import Button from '../components/ui/Button';
 
 function Register() {
   const [email, setEmail] = useState('');
@@ -19,45 +20,60 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
-      <form onSubmit={handleSubmit} className="bg-slate-800 p-8 rounded-lg w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-white mb-6">Créer un compte</h1>
+    <div className="min-h-screen bg-[#09090B] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute w-[500px] h-[500px] bg-[#8B5CF6] opacity-[0.07] blur-[120px] rounded-full pointer-events-none" />
 
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-400 text-sm p-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      <div className="w-full max-w-sm relative">
+        <div className="text-center mb-8">
+          <span className="text-lg font-semibold tracking-tight text-[#FAFAFA]">
+            Midas
+          </span>
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 mb-3 rounded bg-slate-700 text-white placeholder-slate-400 outline-none"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 mb-4 rounded bg-slate-700 text-white placeholder-slate-400 outline-none"
-          required
-        />
-        <button
-          type="submit"
-          className="w-full p-3 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold transition"
-        >
-          S'inscrire
-        </button>
-        <p className="text-slate-400 text-sm mt-4 text-center">
-          Déjà un compte ?{' '}
-          <Link to="/login" className="text-purple-400 hover:underline">
-            Se connecter
-          </Link>
-        </p>
-      </form>
+        <div className="bg-[#111114] border border-white/[0.08] rounded-xl p-6">
+          <h1 className="text-lg font-semibold text-[#FAFAFA] mb-1">
+            Créer un compte
+          </h1>
+          <p className="text-sm text-[#A1A1AA] mb-6">
+            Commence à suivre ton activité
+          </p>
+
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="mb-4 px-3 py-2 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 text-sm text-[#EF4444]">
+                {error}
+              </div>
+            )}
+
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2.5 mb-3 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-[#FAFAFA] placeholder-[#A1A1AA] outline-none focus:border-[#8B5CF6]/50 transition-colors duration-150"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2.5 mb-4 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-[#FAFAFA] placeholder-[#A1A1AA] outline-none focus:border-[#8B5CF6]/50 transition-colors duration-150"
+              required
+            />
+            <Button type="submit" className="w-full justify-center">
+              S'inscrire
+            </Button>
+          </form>
+
+          <p className="text-sm text-[#A1A1AA] mt-5 text-center">
+            Déjà un compte ?{' '}
+            <Link to="/login" className="text-[#8B5CF6] hover:underline">
+              Se connecter
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
