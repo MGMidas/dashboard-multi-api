@@ -5,6 +5,7 @@ const connectionsRoutes = require('./routes/connections.routes');
 const errorHandler = require('./middlewares/errorHandler');
 const { generalLimiter, authLimiter } = require('./middlewares/rateLimiter');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const steamRoutes = require('./routes/steam.routes');
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,7 @@ app.use('/api/auth', authLimiter, authRoutes); // limite plus stricte en plus, s
 
 app.get('/', (req, res) => res.json({ message: 'API dashboard-multi-api en ligne' }));
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/dashboard', steamRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/connections', connectionsRoutes);
 

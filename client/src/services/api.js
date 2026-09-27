@@ -60,3 +60,7 @@ export function disconnectService(service) {
 export function getGithubData() {
   return request('/dashboard/github');
 }
+
+export function getSteamData() {
+  return request('/dashboard/steam');
+}
