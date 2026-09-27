@@ -65,6 +65,7 @@ async function getSteamData(req, res) {
       .slice(0, 5);
 
     // Étape 4 : Enrichir chaque jeu avec RAWG, puis sauvegarder
+    const fetchedAt = new Date();
     const enrichedGames = [];
     for (const game of topGames) {
       const rawgData = await fetchRawgData(game.name);
@@ -78,7 +79,7 @@ async function getSteamData(req, res) {
         rawgImageUrl: rawgData?.imageUrl || null,
       };
 
-      await saveSteamGame(userId, enrichedGame);
+      await saveSteamGame(userId, enrichedGame, fetchedAt);
       enrichedGames.push(enrichedGame);
     }
 

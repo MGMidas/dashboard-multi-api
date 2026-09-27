@@ -1,32 +1,27 @@
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/Navbar';
 import GithubWidget from '../components/widgets/GithubWidget';
 import SteamWidget from '../components/widgets/SteamWidget';
 
 function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-900 px-4 py-8">
-      <div className="max-w-md mx-auto space-y-4">
-        <h1 className="text-2xl font-bold text-white mb-2">
+    <div className="min-h-screen bg-slate-900">
+      <Navbar />
+
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold text-white mb-1">
           Bienvenue, {user?.email}
         </h1>
+        <p className="text-slate-400 text-sm mb-8">
+          Voici un aperçu de ton activité récente
+        </p>
 
-        <div className="flex gap-4 mb-6">
-          <Link to="/connections" className="text-purple-400 hover:underline text-sm">
-            Gérer mes connexions
-          </Link>
-          <button
-            onClick={logout}
-            className="text-slate-400 hover:text-white text-sm"
-          >
-            Se déconnecter
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <GithubWidget />
+          <SteamWidget />
         </div>
-
-        <GithubWidget />
-        <SteamWidget />
       </div>
     </div>
   );

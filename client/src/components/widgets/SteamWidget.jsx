@@ -30,7 +30,7 @@ function SteamWidget() {
   }
 
   return (
-    <div className="bg-slate-800 rounded-lg p-4 w-full">
+    <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 w-full">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-white font-semibold">🎮 Steam</h2>
         {stale && (

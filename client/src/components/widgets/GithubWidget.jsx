@@ -25,7 +25,7 @@ function GithubWidget() {
   }
 
   return (
-    <div className="bg-slate-800 rounded-lg p-4 w-full">
+    <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 w-full">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-white font-semibold">💻 GitHub</h2>
         {stale && (
@@ -46,7 +46,7 @@ function GithubWidget() {
           {repos.map((repo) => (
             <li
               key={repo.id || repo.name}
-              className="bg-slate-700 rounded p-3 text-sm"
+              className="bg-slate-900/40 hover:bg-slate-900/60 rounded-lg p-3 transition ..."
             >
               <p className="text-white font-medium">
                 {repo.repo_name || repo.name}
